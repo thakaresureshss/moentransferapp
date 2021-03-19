@@ -1,0 +1,32 @@
+logging:
+   level:
+      root: INFO
+      org.springframework.web: INFO
+      org.springframework.web.client.RestTemplate: DEBUG
+      com.technical.assgiment.moneytransfer: INFO
+
+server:
+   port: 8080
+   
+spring:
+   application:
+    name: MONEY-TRANSFER-SERVICE
+   profiles:
+      active: dev
+   jpa:
+      show-sql: true
+      hibernate:
+         ddl-auto: none
+      properties:
+         dialect: org.hibernate.dialect.H2Dialect
+   datasource:
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+         pool-name: dpbusers-pool
+         maximum-pool-size: 20
+         max-lifetime: 1800000
+         idle-timeout: 30000
+      url: jdbc:h2:mem:monetransferDb
+      username: sa
+      password: password
+      driver-class-name: org.h2.Driver
