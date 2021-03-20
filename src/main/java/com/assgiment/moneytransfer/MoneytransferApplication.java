@@ -1,4 +1,4 @@
-package com.technical.assgiment.moneytransfer;
+package com.assgiment.moneytransfer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
