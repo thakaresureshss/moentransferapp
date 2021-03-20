@@ -2,13 +2,19 @@ logging:
    level:
       root: INFO
       org.springframework.web: INFO
-      org.springframework.web.client.RestTemplate: DEBUG
-      com.technical.assgiment.moneytransfer: INFO
+      org.springframework.web.client.RestTemplate: INFO
+      com.technical.assgiment.moneytransfer: DEBUG
+
 server:
    port: 8080
+   
 spring:
+   h2:
+     console:
+       enabled: true
+       path: /h2-console
    application:
-      name: MONEY-TRANSFER-SERVICE
+     name: MONEY-TRANSFER-SERVICE
    jpa:
       show-sql: true
       hibernate:
@@ -22,7 +28,7 @@ spring:
          maximum-pool-size: 20
          max-lifetime: 1800000
          idle-timeout: 30000
-      url: jdbc:h2:mem:monetransferDb
+      url: jdbc:h2:mem:testDb
       username: sa
       password: password
       driver-class-name: org.h2.Driver
