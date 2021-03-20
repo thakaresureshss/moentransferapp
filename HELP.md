@@ -15,7 +15,9 @@ A Java RESTful API for money transfers between users accounts
 - Checkout Code from develop branch
   -  https://github.com/thakaresureshss/moentransferapp.git
 - Build Project(Goto inside checked out folder)
-  -  mvn clean install
+ ```sh
+  mvn clean install
+```
 - Run Jar 
   -  Use Below command 
 ```sh
@@ -45,10 +47,11 @@ Application starts a embedded server on localhost port 8080 An H2 in memory data
 ```
 
 ### Important Enpoints
-
 -   http://localhost:8080/v1/customers/add
 -   http://localhost:8080/v1/accounts/add
 -   http://localhost:8080/v1/accounts/1/link/customer/2
+-   http://localhost:8080/v1/accounts/transfer/1
+-   http://localhost:8080/v1/accounts/2
 
 ### Available Services
 
