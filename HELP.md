@@ -52,8 +52,25 @@ Application starts a embedded server on localhost port 8080 An H2 in memory data
 -   http://localhost:8080/v1/accounts/1/link/customer/2
 -   http://localhost:8080/v1/accounts/transfer/1
 -   http://localhost:8080/v1/accounts/2
+-   http://localhost:8080/v1/accounts/transactions/1
 
 ### Available Services
+
+- Add Customer
+- Update Customer Details
+- Delete Customer 
+- Retrieve Customer Details
+- List Details of All Customer 
+- Add Account
+- Update Account Details
+- Delete Account 
+- Retrieve Account Details
+- List Details of All Account 
+- Link Account to Custommer
+- Transfer money from once account to other
+- View Balance for both account (Retrieve Account Details)
+- View Transaction Details for both account.
+
 
 ### Http Status
 - 200 OK: The request has succeeded
