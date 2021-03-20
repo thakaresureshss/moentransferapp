@@ -10,20 +10,45 @@ A Java RESTful API for money transfers between users accounts
 - Jacoco (code coverage tool)
 - Swagger API Documentation
 
-
 ### How to run
-```sh
-java -jar 
-```
 
-Application starts a embedded server on localhost port 8080 An H2 in memory database initialized with some sample user and account data To view
+- Checkout Code from develop branch
+  -  https://github.com/thakaresureshss/moentransferapp.git
+- Build Project(Goto inside checked out folder)
+  -  mvn clean install
+- Run Jar 
+  -  Use Below command 
+```sh
+java -jar moneytransfer-0.0.1-SNAPSHOT.jar
+```
+- Test Application 
+
+Application starts a embedded server on localhost port 8080 An H2 in memory database initialized with some sample user and account data To view, Use Swagger to test application using below url
 
 - http://localhost:8080/swagger-ui.html
 
+-  Steps to Folllow 
+    -  Create First Customer 
+    -  Create First Account 
+    -  Link Account to Customer 
+    -  Repeat Above 3 step for second Customer and Account 
+    -  Transfer Amount from Account 1 to Account 2
+    -  Check balance of Account 1 and 2 
+    -  Check Transactions for Account 1 and Account 2.
+    -  
+
+### Code Coverage Enpoints
+- Use below command inside the root directory of code 
+   -  Use Below command 
+```sh
+ mvn test jacoco:report
+```
+
 ### Important Enpoints
 
--  http://localhost:8080/v1/accounts/add
--  http://localhost:8080/v1/accounts/1/link/customer/2
+-   http://localhost:8080/v1/customers/add
+-   http://localhost:8080/v1/accounts/add
+-   http://localhost:8080/v1/accounts/1/link/customer/2
 
 ### Available Services
 
@@ -133,3 +158,4 @@ Endpoint :  http://localhost:8080/v1/accounts/2
 - Add Liquibase for Database Migration 
 - Add Checkstyle to mantain Coding standard 
 - Currency And Conversion Rates
+- Proper Documentation (Help.md file )
