@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@Slf4j
 public class BankServiceImpl implements BankService {
 	@Autowired
 	private CustomerRepository customerRepo;
@@ -75,6 +77,7 @@ public class BankServiceImpl implements BankService {
 		if (customerEntityOpt.isPresent()) {
 			return bankServiceMapper.mapToCustomerDto(customerEntityOpt.get());
 		} else {
+			log.error("Customer Not found {}", customerNumber);
 			throw new ResourceNotFoundException("Customer", "customerNumber", customerNumber);
 		}
 	}
@@ -95,6 +98,7 @@ public class BankServiceImpl implements BankService {
 			dbCustomer.setUpdateDateTime(new Date());
 			return bankServiceMapper.mapToCustomerDto(customerRepo.save(dbCustomer));
 		} else {
+			log.error("Customer not available with customer number {}", customerNumber);
 			throw new BadRequestException("Customer not available with customerNumber :" + customerNumber);
 		}
 	}
@@ -112,6 +116,7 @@ public class BankServiceImpl implements BankService {
 			Customer managedCustomerEntity = managedCustomerEntityOpt.get();
 			customerRepo.delete(managedCustomerEntity);
 		} else {
+			log.error("{} Customer does not exist.", customerNumber);
 			throw new BadRequestException(customerNumber + "Customer does not exist.");
 		}
 	}
@@ -127,6 +132,7 @@ public class BankServiceImpl implements BankService {
 		if (accountEntityOpt.isPresent()) {
 			return bankServiceMapper.mapToAccountDto(accountEntityOpt.get());
 		} else {
+			log.error("Account Not found with Account Number {} .", accountNumber);
 			throw new ResourceNotFoundException("Account", "accountNumber", accountNumber);
 		}
 
@@ -189,6 +195,7 @@ public class BankServiceImpl implements BankService {
 			return bankServiceMapper.mapToAccountDto(accountRepo.findByAccountNumber(accountNumber).get());
 
 		} else {
+			log.error("From account number is not valid {} .", accountNumber);
 			throw new BadRequestException("From account number is not valid" + accountNumber);
 		}
 	}
@@ -198,11 +205,15 @@ public class BankServiceImpl implements BankService {
 		if (toAccountOpt.isPresent()) {
 			toAccount = toAccountOpt.get();
 		} else {
-			throw new BadRequestException("To Account Number " + transferDetails.getToAccountNumber() + " not found.");
+			log.error("Payee Account Number {} not found.", transferDetails.getToAccountNumber());
+			throw new BadRequestException(
+					"Payee Account Number " + transferDetails.getToAccountNumber() + " not found.");
 		}
 
 		// Validate From Account Balance
 		if (fromAccount.getAccountBalance() < transferDetails.getTransferAmount()) {
+			log.error("Requested {} balance Not available in {} .", fromAccount.getAccountBalance(),
+					fromAccount.getAccountNumber());
 			throw new BadRequestException("Insufficient balance.");
 		}
 		return toAccount;
@@ -238,6 +249,7 @@ public class BankServiceImpl implements BankService {
 			dbAccount.setUpdateDateTime(new Date());
 			return bankServiceMapper.mapToAccountDto(accountRepo.save(dbAccount));
 		} else {
+			log.error("Account not available with customerNumber {} .", accountNumber);
 			throw new BadRequestException("Account not available with customerNumber :" + accountNumber);
 		}
 	}
@@ -254,6 +266,7 @@ public class BankServiceImpl implements BankService {
 			Account managedCustomerEntity = accountOpt.get();
 			accountRepo.delete(managedCustomerEntity);
 		} else {
+			log.error("{} Account does not exist.", accountNumber);
 			throw new BadRequestException(accountNumber + "Account does not exist.");
 		}
 	}
@@ -262,10 +275,12 @@ public class BankServiceImpl implements BankService {
 	public void linkAccount(Long accountNumber, Long customerNumber) {
 		Optional<Account> accountOptional = accountRepo.findByAccountNumber(accountNumber);
 		if (!accountOptional.isPresent()) {
+			log.error("{} Invalid Account number.", accountNumber);
 			throw new BadRequestException("Invalid Account number");
 		}
 		Optional<Customer> customerOptional = customerRepo.findByCustomerNumber(customerNumber);
 		if (!customerOptional.isPresent()) {
+			log.error("{} Invalid Customer number.", customerNumber);
 			throw new BadRequestException("Invalid Customer number");
 		}
 		Customer customer = customerOptional.get();
