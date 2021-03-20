@@ -38,7 +38,7 @@ public class CustomerController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 
 	public ResponseEntity<?> addCustomer(@Valid @RequestBody CustomerDto customer) {
-		log.debug("Adding customer details");
+		log.debug("Adding customer details {}", customer);
 		return new ResponseEntity<>(bankService.addCustomer(customer), HttpStatus.CREATED);
 	}
 
@@ -50,7 +50,7 @@ public class CustomerController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 
 	public ResponseEntity<CustomerDto> getCustomer(@PathVariable Long customerNumber) {
-		log.debug("Adding customer details");
+		log.debug("Retrieving customer for customerNumber {}", customerNumber);
 		return new ResponseEntity<>(bankService.findByCustomerNumber(customerNumber), HttpStatus.OK);
 	}
 
@@ -62,6 +62,7 @@ public class CustomerController {
 
 	public ResponseEntity<Object> updateCustomer(@Valid @RequestBody CustomerDto customerDetails,
 			@PathVariable Long customerNumber) {
+		log.debug("Updating customer for customerNumber {} Customer Details {}", customerNumber, customerDetails);
 		return new ResponseEntity<>(bankService.updateCustomer(customerDetails, customerNumber), HttpStatus.OK);
 	}
 
@@ -71,7 +72,7 @@ public class CustomerController {
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 	public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-		log.debug("Getting customer details");
+		log.debug("Retrieving All Customers");
 		return new ResponseEntity<>(bankService.findAll(), HttpStatus.OK);
 	}
 
