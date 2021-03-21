@@ -34,7 +34,7 @@ public class Customer {
 	@Column(name = "last_name")
 	private String lastName;
 
-	@Column(name = "customer_number")
+	@Column(name = "customer_number", unique = true)
 	private Long customerNumber;
 
 	@Column(name = "status")

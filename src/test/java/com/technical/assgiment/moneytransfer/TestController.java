@@ -151,6 +151,38 @@ public class TestController {
 				.andExpect(jsonPath("$.lastName").value("Update LastName 1"));
 	}
 
+	@Test
+	@Order(9)
+	public void addWhen_customer_with_DuplicateCustomerNumber_thenReturnBadRequwest() throws Exception {
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post("/v1/customers/add")
+						.content(jsonUtils.toJsonString(TestData.getFirstCustomer()))
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+	@Test
+	@Order(9)
+	public void addWhen_customer_with_DuplicateEmail_thenReturnBadRequwest() throws Exception {
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post("/v1/customers/add")
+						.content(jsonUtils.toJsonString(TestData.getFirstCustomer()))
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+	
+	@Test
+	@Order(10)
+	public void addWhen_customer_with_EmptyDob_thenReturnBadRequwest() throws Exception {
+		CustomerDto firstCustomer = TestData.getFirstCustomer();
+		firstCustomer.setDob(null);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post("/v1/customers/add")
+						.content(jsonUtils.toJsonString(firstCustomer))
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest()).andDo(print());
+	}
+
+
 	// Account Test Case
 
 	@Test
@@ -196,9 +228,10 @@ public class TestController {
 	@Order(15)
 	public void addWhen_account_thenReturnAccountCreated() throws Exception {
 
+		AccountDto secondAccount = TestData.getSecondAccount();
+		secondAccount.getBankDetailDto().setBranchCode("NBD-1120");
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.post("/v1/accounts/add")
-						.content(jsonUtils.toJsonString(TestData.getSecondAccount()))
+				.perform(MockMvcRequestBuilders.post("/v1/accounts/add").content(jsonUtils.toJsonString(secondAccount))
 						.contentType(MediaType.APPLICATION_JSON_VALUE))
 				.andExpect(status().isCreated()).andDo(print()).andExpect(jsonPath("$.id").exists())
 				.andExpect(jsonPath("$.accountNumber").value(1112l));
@@ -231,6 +264,16 @@ public class TestController {
 				.andExpect(jsonPath("$.accountStatus").value(AccountStatusEnum.INACTIVE.getValue()))
 				.andExpect(jsonPath("$.accountType").value(AccountTypeEnum.CURRENT.getValue()))
 				.andExpect(jsonPath("$.accountBalance").value(1000.21));
+	}
+
+	@Test
+	@Order(18)
+	public void addWhen_duplicateAccountNumber_thenBadRequest() throws Exception {
+		AccountDto secondAccount = TestData.getSecondAccount();
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post("/v1/accounts/add").content(jsonUtils.toJsonString(secondAccount))
+						.contentType(MediaType.APPLICATION_JSON_VALUE))
+				.andExpect(status().isBadRequest()).andDo(print());
 	}
 
 	@Test

@@ -26,7 +26,7 @@ public class BankDetail {
 	@Column(name = "branch_name")
 	private String branchName;
 
-	@Column(name = "branch_code")
+	@Column(name = "branch_code", unique = true)
 	private String branchCode;
 
 	@OneToOne(cascade = CascadeType.ALL)
