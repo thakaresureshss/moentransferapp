@@ -83,7 +83,8 @@ Application starts a embedded server on localhost port 8080 An H2 in memory data
 ### Sample JSON for User and Account
 ##### Customer Creation :
 Endpoint : http://localhost:8080/v1/customers/add
-```sh{
+```sh
+{
   "contactDetailDto": {
     "emailId": "sonalithakare@gmail.com",
     "mobile": "+971589002023",
