@@ -60,12 +60,12 @@ Application starts a embedded server on localhost port 8080 An H2 in memory data
 - Update Customer Details
 - Delete Customer 
 - Retrieve Customer Details
-- List Details of All Customer 
+- List Details of All Customers 
 - Add Account
 - Update Account Details
 - Delete Account 
 - Retrieve Account Details
-- List Details of All Account 
+- List Details of All Accounts 
 - Link Account to Custommer
 - Transfer money from once account to other
 - View Balance for both account (Retrieve Account Details)
@@ -101,7 +101,8 @@ Endpoint : http://localhost:8080/v1/customers/add
   ],
   "firstName": "Sonali",
   "lastName": "Thakare",
-    "status": "ACTIVE",
+  "dob":"1989-01-27",
+  "status": "ACTIVE",
   "customerNumber": 2
 }
 
@@ -173,7 +174,7 @@ Endpoint :  http://localhost:8080/v1/accounts/2
 ## Future Scope (Not Considering now because of Time Limit: Need to considered ):
 - Concurrency Using Optimistic (Database row locking)
 - Advance Data Validation
-- Advance Booking Business Rule Implementation
+- Advance Banking Business Rule Implementation
 - Security to Rest Endpoint 
 - Add Liquibase for Database Migration 
 - Add Checkstyle to mantain Coding standard 
