@@ -50,10 +50,10 @@ public class Customer {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Contact contactDetails;
 
-	@Temporal(TemporalType.TIME)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDateTime;
 
-	@Temporal(TemporalType.TIME)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDateTime;
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
