@@ -101,6 +101,7 @@ Endpoint : http://localhost:8080/v1/customers/add
   ],
   "firstName": "Sonali",
   "lastName": "Thakare",
+  "dob":"1989-01-27",
     "status": "ACTIVE",
   "customerNumber": 2
 }
