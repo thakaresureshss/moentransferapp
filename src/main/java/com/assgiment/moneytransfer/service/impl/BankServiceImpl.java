@@ -13,11 +13,14 @@ import com.assgiment.moneytransfer.repository.AccountRepository;
 import com.assgiment.moneytransfer.repository.CustomerRepository;
 import com.assgiment.moneytransfer.repository.TransactionRepository;
 import com.assgiment.moneytransfer.service.BankService;
+import com.assgiment.moneytransfer.utils.CustomerStatusEnum;
 import com.assgiment.moneytransfer.utils.MoneyTransferMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +63,27 @@ public class BankServiceImpl implements BankService {
 	 * @return
 	 */
 	public CustomerDto addCustomer(CustomerDto customerDto) {
+		if (customerDto.getDob() == null) {
+			log.error("Validation Error : Date of Birth Should not be blank or empty");
+			throw new BadRequestException("Validation Error: Date of Birth Should not be blank or empty");
+		}
+
+		if (customerDto.getContactDetailDto() == null || customerDto.getContactDetailDto().getEmailId() == null
+				|| " ".equalsIgnoreCase(customerDto.getContactDetailDto().getEmailId())) {
+			log.error("Validation Error : Email Should not be blank or empty");
+			throw new BadRequestException("Validation Error: Email Should not be blank or empty");
+		}
+
+		Iterable<Customer> findAll = customerRepo.findAll();
+		Spliterator<Customer> spliterator = findAll.spliterator();
+		if (StreamSupport.stream(spliterator, false).anyMatch(customer -> customer.getContactDetails().getEmailId()
+				.equals(customerDto.getContactDetailDto().getEmailId()))) {
+			log.error("Validation Error : Email is not available with this id {}",
+					customerDto.getContactDetailDto().getEmailId());
+			throw new BadRequestException("Validation Error: Email is not available with this id"
+					+ customerDto.getContactDetailDto().getEmailId());
+		}
+
 		Customer customer = bankServiceMapper.mapToCustomerEntity(customerDto, new Customer());
 		customer.setCreateDateTime(new Date());
 		return bankServiceMapper.mapToCustomerDto(customerRepo.save(customer));
@@ -217,6 +241,25 @@ public class BankServiceImpl implements BankService {
 					fromAccount.getAccountNumber());
 			throw new BadRequestException("Insufficient balance.");
 		}
+
+		// Validate From Account Balance
+		if (toAccount.getAccountNumber() == fromAccount.getAccountNumber()) {
+			log.error("Same account payment transfer not allowed.");
+			throw new BadRequestException("Same from and payee account numbers are same");
+		}
+
+		if (toAccount.getCustomer() != null
+				&& !CustomerStatusEnum.ACTIVE.getValue().equals(toAccount.getCustomer().getStatus())) {
+			log.error("Payee Account is not linked to any customer or linked customer is not active");
+			throw new BadRequestException("Payee Account is not to any customer or linked customer is not active");
+		}
+		if (fromAccount.getCustomer() != null
+				&& !CustomerStatusEnum.ACTIVE.getValue().equals(fromAccount.getCustomer().getStatus())) {
+			log.error(" From account is not linked to any customer or linked customer is not active");
+			throw new BadRequestException(
+					"From Account is not linked to any customer or linked customer is not active");
+		}
+
 		return toAccount;
 	}
 
@@ -264,8 +307,12 @@ public class BankServiceImpl implements BankService {
 	public void deleteAccount(Long accountNumber) {
 		Optional<Account> accountOpt = accountRepo.findByAccountNumber(accountNumber);
 		if (accountOpt.isPresent()) {
-			Account managedCustomerEntity = accountOpt.get();
-			accountRepo.delete(managedCustomerEntity);
+			Account account = accountOpt.get();
+			int linkedAccounts = account.getCustomer().getAccounts().size();
+			if (linkedAccounts == 1) {
+				customerRepo.delete(account.getCustomer());
+			}
+			accountRepo.delete(account);
 		} else {
 			log.error("{} Account does not exist.", accountNumber);
 			throw new BadRequestException(accountNumber + "Account does not exist.");

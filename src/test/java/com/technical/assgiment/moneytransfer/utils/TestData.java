@@ -8,8 +8,11 @@ import com.assgiment.moneytransfer.dto.CustomerDto;
 import com.assgiment.moneytransfer.utils.AccountStatusEnum;
 import com.assgiment.moneytransfer.utils.AccountTypeEnum;
 import com.assgiment.moneytransfer.utils.CustomerStatusEnum;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class TestData {
@@ -58,8 +61,19 @@ public class TestData {
 		customerDto.setStatus(CustomerStatusEnum.ACTIVE);
 		customerDto.setCustomerNumber(1001l);
 		customerDto.setContactDetailDto(getContactDto());
+		customerDto.setDob(getDob("27-10-1989"));
 		customerDto.setCustomerAddressDtos(Collections.singletonList(getAddressDto()));
 		return customerDto;
+	}
+
+	private static Date getDob(String dob) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
+		try {
+			return formatter.parse(dob);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static CustomerDto getSecondCustomer() {
@@ -67,7 +81,9 @@ public class TestData {
 		customerDto.setFirstName("Prajakta");
 		customerDto.setLastName("Thakare");
 		customerDto.setStatus(CustomerStatusEnum.ACTIVE);
-		customerDto.setCustomerNumber(1002l); // Different Customer Number
+		customerDto.setCustomerNumber(1002l);
+		customerDto.setDob(getDob("17-10-1989"));
+		// Different Customer Number
 		customerDto.setContactDetailDto(getSecondContactDto());
 		List<AddressDto> addressess = new ArrayList<AddressDto>();
 		addressess.add(getAddressDto());
@@ -82,6 +98,7 @@ public class TestData {
 		customerDto.setLastName("Thakare");
 		customerDto.setStatus(CustomerStatusEnum.INACTIVE);
 		customerDto.setCustomerNumber(1003l);
+		customerDto.setDob(getDob("17-10-1995"));
 		customerDto.setContactDetailDto(getSecondContactDto());
 		List<AddressDto> addressess = new ArrayList<AddressDto>();
 		addressess.add(getSecondAddressDto());

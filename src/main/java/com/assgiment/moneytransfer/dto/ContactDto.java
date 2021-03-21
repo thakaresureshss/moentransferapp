@@ -2,6 +2,7 @@ package com.assgiment.moneytransfer.dto;
 
 import com.sun.istack.NotNull;
 import java.util.UUID;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,12 +14,11 @@ public class ContactDto {
 
 	private UUID id;
 
-	@NotNull
-	// Email Validation Can be added ignored for now
+	@NotBlank(message = "customer email should not empty")
 	private String emailId;
 
 	private String phone;
-	
+
 	@NotNull
 	private String mobile;
 
