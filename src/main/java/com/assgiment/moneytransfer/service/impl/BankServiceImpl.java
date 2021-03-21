@@ -147,8 +147,9 @@ public class BankServiceImpl implements BankService {
 	 * @return
 	 */
 	public AccountDto addNewAccount(AccountDto accountDto) {
-		return bankServiceMapper
-				.mapToAccountDto(accountRepo.save(bankServiceMapper.mapToAccountEntity(accountDto, new Account())));
+		Account account = bankServiceMapper.mapToAccountEntity(accountDto, new Account());
+		account.setCreateDateTime(new Date());
+		return bankServiceMapper.mapToAccountDto(accountRepo.save(account));
 	}
 
 	/**

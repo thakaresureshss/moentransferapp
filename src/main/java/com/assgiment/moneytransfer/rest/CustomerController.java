@@ -11,7 +11,6 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,7 @@ public class CustomerController {
 	@Autowired
 	private BankService bankService;
 
-	@PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/add")
 	@ApiOperation(value = "Add a Customer", notes = "Add customer and create an account")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"),
@@ -42,7 +41,7 @@ public class CustomerController {
 		return new ResponseEntity<>(bankService.addCustomer(customer), HttpStatus.CREATED);
 	}
 
-	@GetMapping(path = "/{customerNumber}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/{customerNumber}")
 	@ApiOperation(value = "Get customer details", notes = "Get Customer details by customer number.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Success", response = CustomerDto.class, responseContainer = "Object"),
@@ -54,7 +53,7 @@ public class CustomerController {
 		return new ResponseEntity<>(bankService.findByCustomerNumber(customerNumber), HttpStatus.OK);
 	}
 
-	@PutMapping(path = "/{customerNumber}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(path = "/{customerNumber}")
 	@ApiOperation(value = "Update customer", notes = "Update customer and any other account information associated with him.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = Object.class),
 			@ApiResponse(code = 400, message = "Bad Request"),
@@ -66,7 +65,7 @@ public class CustomerController {
 		return new ResponseEntity<>(bankService.updateCustomer(customerDetails, customerNumber), HttpStatus.OK);
 	}
 
-	@GetMapping(path = "/all", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/all")
 	@ApiOperation(value = "Find all customers", notes = "Gets details of all the customers")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "Bad Request"),
@@ -76,7 +75,7 @@ public class CustomerController {
 		return new ResponseEntity<>(bankService.findAll(), HttpStatus.OK);
 	}
 
-	@DeleteMapping(path = "/{customerNumber}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(path = "/{customerNumber}")
 	@ApiOperation(value = "Delete customer and related accounts", notes = "Delete customer and all accounts associated with him.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = Object.class),
 			@ApiResponse(code = 400, message = "Bad Request"),
