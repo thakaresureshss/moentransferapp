@@ -63,6 +63,13 @@ public class BankServiceImpl implements BankService {
 	 * @return
 	 */
 	public CustomerDto addCustomer(CustomerDto customerDto) {
+		validateCustomerData(customerDto);
+		Customer customer = bankServiceMapper.mapToCustomerEntity(customerDto, new Customer());
+		customer.setCreateDateTime(new Date());
+		return bankServiceMapper.mapToCustomerDto(customerRepo.save(customer));
+	}
+
+	private void validateCustomerData(CustomerDto customerDto) {
 		if (customerDto.getDob() == null) {
 			log.error("Validation Error : Date of Birth Should not be blank or empty");
 			throw new BadRequestException("Validation Error: Date of Birth Should not be blank or empty");
@@ -73,7 +80,6 @@ public class BankServiceImpl implements BankService {
 			log.error("Validation Error : Email Should not be blank or empty");
 			throw new BadRequestException("Validation Error: Email Should not be blank or empty");
 		}
-
 		Iterable<Customer> findAll = customerRepo.findAll();
 		Spliterator<Customer> spliterator = findAll.spliterator();
 		if (StreamSupport.stream(spliterator, false).anyMatch(customer -> customer.getContactDetails().getEmailId()
@@ -83,10 +89,12 @@ public class BankServiceImpl implements BankService {
 			throw new BadRequestException("Validation Error: Email is not available with this id"
 					+ customerDto.getContactDetailDto().getEmailId());
 		}
-
-		Customer customer = bankServiceMapper.mapToCustomerEntity(customerDto, new Customer());
-		customer.setCreateDateTime(new Date());
-		return bankServiceMapper.mapToCustomerDto(customerRepo.save(customer));
+		if (StreamSupport.stream(spliterator, false)
+				.anyMatch(customer -> customer.getCustomerNumber() == customerDto.getCustomerNumber())) {
+			log.error("Validation Error : Customer id not available with this id {}", customerDto.getCustomerNumber());
+			throw new BadRequestException(
+					"Validation Error: Customer id not available with this id" + customerDto.getCustomerNumber());
+		}
 	}
 
 	/**

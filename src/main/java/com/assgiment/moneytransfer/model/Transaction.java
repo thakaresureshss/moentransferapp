@@ -1,4 +1,5 @@
 package com.assgiment.moneytransfer.model;
+
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -20,16 +21,16 @@ import lombok.Setter;
 public class Transaction {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="TX_ID")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
 	private UUID id;
-	
+
 	private Long accountNumber;
-	
-	@Temporal(TemporalType.TIME)
+
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date txDateTime;
-	
+
 	private String txType;
-	
+
 	private Double txAmount;
 }

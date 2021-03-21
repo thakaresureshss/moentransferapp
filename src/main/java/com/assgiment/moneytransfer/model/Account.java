@@ -11,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class Account {
 	@Column(name = "id")
 	private UUID id;
 
-	@Column(name = "account_number")
+	@Column(name = "account_number", unique = true)
 	private Long accountNumber; // Auto Generated String Value
 
 	@Column(name = "account_status")
@@ -53,7 +52,7 @@ public class Account {
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	private BankDetail bankDetail;
 
 }
