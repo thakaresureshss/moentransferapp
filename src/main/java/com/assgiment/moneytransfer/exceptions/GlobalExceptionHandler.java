@@ -47,6 +47,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.NOT_FOUND);
 	}
 
+	@ExceptionHandler(ValidationException.class)
+	public ResponseEntity<ErrorMessage> handleValidationExceptionException(ValidationException ex, WebRequest request) {
+		log.error("handling ValidationException constraints Exception ...");
+		ErrorMessage exception = new ErrorMessage(new Date(), "Validation failed.", request.getDescription(false),
+				ex.getViolations());
+		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.UNPROCESSABLE_ENTITY);
+	}
+
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ErrorMessage> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
 			WebRequest request) {

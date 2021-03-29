@@ -3,8 +3,10 @@ package com.assgiment.moneytransfer.service.impl;
 import com.assgiment.moneytransfer.dto.AccountDto;
 import com.assgiment.moneytransfer.dto.TransactionDetailsDto;
 import com.assgiment.moneytransfer.dto.TransferDetailsDto;
+import com.assgiment.moneytransfer.errors.Violation;
 import com.assgiment.moneytransfer.exceptions.BadRequestException;
 import com.assgiment.moneytransfer.exceptions.ResourceNotFoundException;
+import com.assgiment.moneytransfer.exceptions.ValidationException;
 import com.assgiment.moneytransfer.model.Account;
 import com.assgiment.moneytransfer.model.Transaction;
 import com.assgiment.moneytransfer.repository.AccountRepository;
@@ -21,12 +23,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+/**
+ * 
+ * @author suresh.thakare
+ * 
+ *         Note
+ * 
+ *         Synchronized should be used if scalable application expected
+ * 
+ *         Use database locking optimistic locking
+ *
+ */
 @Service
 @Transactional
 @Slf4j
 public class AccountServiceImpl implements AccountService {
-	
+
 	@Autowired
 	private CustomerRepository customerRepo;
 	@Autowired
@@ -87,9 +101,11 @@ public class AccountServiceImpl implements AccountService {
 
 			Account fromAccount = accountOpt.get();
 			Optional<Account> toAccountOpt = accountRepo.findByAccountNumber(transferDetails.getToAccountNumber());
-			toAccount = validateAccounts(transferDetails, toAccount, fromAccount, toAccountOpt);
+
+			toAccount = validateAccounts(transferDetails, toAccount, fromAccount, toAccountOpt, violations);
 
 			synchronized (this) {
+
 				// update FROM ACCOUNT
 				fromAccount.setAccountBalance(fromAccount.getAccountBalance() - transferDetails.getTransferAmount());
 				fromAccount.setUpdateDateTime(new Date());
@@ -122,39 +138,46 @@ public class AccountServiceImpl implements AccountService {
 
 	private Account validateAccounts(TransferDetailsDto transferDetails, Account toAccount, Account fromAccount,
 			Optional<Account> toAccountOpt) {
+		List<Violation> violations = new ArrayList<Violation>();
 		if (toAccountOpt.isPresent()) {
 			toAccount = toAccountOpt.get();
 		} else {
+			violations.add(new Violation("toAccountNumber",
+					"Payee Account Number " + transferDetails.getToAccountNumber() + " not found."));
 			log.error("Payee Account Number {} not found.", transferDetails.getToAccountNumber());
-			throw new BadRequestException(
-					"Payee Account Number " + transferDetails.getToAccountNumber() + " not found.");
 		}
 
 		// Validate From Account Balance
 		if (fromAccount.getAccountBalance() < transferDetails.getTransferAmount()) {
+			violations
+					.add(new Violation("transferAmount", transferDetails.getTransferAmount() + " Insufficient balance ("
+							+ transferDetails.getTransferAmount() + ") in payers account(" + fromAccount + ")."));
 			log.error("Requested {} balance Not available in {} .", fromAccount.getAccountBalance(),
 					fromAccount.getAccountNumber());
-			throw new BadRequestException("Insufficient balance.");
 		}
 
 		// Validate From Account Balance
 		if (toAccount.getAccountNumber() == fromAccount.getAccountNumber()) {
 			log.error("Same account payment transfer not allowed.");
-			throw new BadRequestException("Same from and payee account numbers are same");
+			violations.add(new Violation("toAccountNumber",
+					"Payer and payee account numbers are same, It should be different "));
 		}
 
 		if (toAccount.getCustomer() != null
 				&& !CustomerStatusEnum.ACTIVE.getValue().equals(toAccount.getCustomer().getStatus())) {
 			log.error("Payee Account is not linked to any customer or linked customer is not active");
-			throw new BadRequestException("Payee Account is not to any customer or linked customer is not active");
+			violations.add(new Violation("toAccountNumber",
+					"Payee Account is not linked to any customer or linked customer is not active"));
 		}
 		if (fromAccount.getCustomer() != null
 				&& !CustomerStatusEnum.ACTIVE.getValue().equals(fromAccount.getCustomer().getStatus())) {
 			log.error(" From account is not linked to any customer or linked customer is not active");
-			throw new BadRequestException(
-					"From Account is not linked to any customer or linked customer is not active");
+			violations.add(new Violation("fromAccountNumber",
+					"From Account is not linked to any customer or linked customer is not active"));
 		}
-
+		if (!CollectionUtils.isEmpty(violations)) {
+			throw new ValidationException(violations);
+		}
 		return toAccount;
 	}
 
@@ -214,5 +237,4 @@ public class AccountServiceImpl implements AccountService {
 		}
 	}
 
-	
 }
