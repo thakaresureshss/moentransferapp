@@ -3,8 +3,6 @@ package com.assgiment.moneytransfer.exceptions;
 import com.assgiment.moneytransfer.errors.ErrorMessage;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,34 +15,53 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 @Slf4j
 @Validated
+
+/**
+ * 
+ * @author suresh.thakare
+ *
+ *         Note :
+ * 
+ *         Handle all the exception individually not to use instance of in
+ *         generic exception handler(Exception.class)
+ * 
+ *         Remove unused code autowired fields from class
+ * 
+ *         Return type should be specific not generic for each request
+ * 
+ */
+
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-	@Autowired
-	ApplicationContext context;
 
 	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity<?> handleBadRequest(BadRequestException ex, WebRequest request) {
-		log.debug("handling BadRequestException...");
+	public ResponseEntity<ErrorMessage> handleBadRequest(BadRequestException ex, WebRequest request) {
+		log.error("handling BadRequestException...");
 		ErrorMessage exception = new ErrorMessage(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity(exception, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
-		log.debug("handling ResourceNotFoundException...");
+	public ResponseEntity<ErrorMessage> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
+		log.error("handling ResourceNotFoundException...");
 		ErrorMessage exception = new ErrorMessage(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity(exception, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ErrorMessage> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
+			WebRequest request) {
+		log.error("handling Integrity constraints Exception ...");
+		ErrorMessage exception = new ErrorMessage(new Date(),
+				"Invalid data provided in request or unique data required .", request.getDescription(false));
+		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
+	public ResponseEntity<ErrorMessage> handleGlobalException(Exception ex, WebRequest request) {
 		ex.printStackTrace();
-		log.debug("handling Exception...");
-		if (ex instanceof DataIntegrityViolationException) {
-			ErrorMessage exception = new ErrorMessage(new Date(), ex.getMessage(), request.getDescription(false));
-			return new ResponseEntity(exception, HttpStatus.BAD_REQUEST);
-		}
+		log.error("handling Exception...");
 		ErrorMessage exception = new ErrorMessage(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<ErrorMessage>(exception, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }
